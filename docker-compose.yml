@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: ysissoko/lacollection-app:${FRONTEND_VERSION}
+    container_name: lacollection-app
+    working_dir: /app
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+  backend:
+    image: ysissoko/lacollection-backend:${BACKEND_VERSION}
+    container_name: lacollection-backend
+    working_dir: /app
+    volumes:
+      - .env:/app/.env:rw
+      - ./upload/photos/palettes:/app/upload/photos/palettes:rw
+      - ./upload/photos/areas:/app/upload/photos/areas:rw
+      - ./upload/photos/options:/app/upload/photos/options:rw
+      - appdata:/app/data
+    ports:
+      - "${APP_PORT-8080}:${APP_PORT-8080}"
+    environment:
+      - APP_PORT=${APP_PORT-8080}
+      - DATA_DIR=${DATA_DIR-/app/data}
+      - UPLOAD_DIR=${UPLOAD_DIR-/app/upload}
+
+volumes:
+  appdata:
