@@ -1,0 +1,84 @@
+api-gateway:
+  host: backend
+  port: 3000
+  typeorm:
+    name: default
+    type: postgres
+    host: database
+    port: 5432
+    username: postgres
+    password: postgres
+    database: lacollection_db
+    synchronize: false # set to false in production
+    entities: ["dist/**/*.entity{.ts,.js}"]
+  auth:
+    otp:
+      enabled: false
+      template: |
+        <html>
+          <body>
+            <h1>Verify your email</h1>
+            <p>Use this OTP to validate your request: <strong>{{otp}}</strong></p>
+          </body>
+        </html>
+      expiry: "15m"
+    verificationEmail:
+      enabled: false
+      token:
+        expiresIn: "24h"
+        secret: "a_different_secret_for_email_verification"
+      template: |
+        <html>
+          <body>
+            <h1>Verify your email</h1>
+            {{#if otp}}
+              <p>Use this OTP to validate your request: <strong>{{otp}}</strong></p>
+            {{/if}}
+            <p>Click <a href="http://localhost:5174/auth/verify?token={{token}}">here</a> to verify your email</p>
+          </body>
+        </html>
+    resetPasswordEmail:
+      token:
+        expiresIn: "1h"
+        secret: "a_different_secret_for_password_reset"
+      template: |
+        <html>
+          <body>
+            <h1>Reset your password</h1>
+            {{#if otp}}
+              <p>Use this OTP to validate your request: <strong>{{otp}}</strong></p>
+            {{/if}}
+            <p>Click <a href="http://localhost:5174/auth/reset-password?token={{token}}">here</a> to reset your password</p>
+          </body>
+        </html>
+    # add max login attempts if needed
+    # maxLoginAttempts: 5
+    jwt:
+      secret: 8a7cc3610b29ee62df6e1bc519cfe62562ef7cb55028c22bd7d2db412d8a9554
+      signOptions:
+        expiresIn: 60m
+        issuer: lacollection-account-service
+    passport:
+      defaultStrategy: "jwt"
+  cors:
+    origin: ["https://lacollection.mansadev.com"]
+    methods: GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS
+    allowedHeaders: Origin, X-Requested-With, Content-Type, Accept, Authorization, X-Auth-Token
+    credentials: true
+  mailer:
+    options:
+      transport:
+        host: smtp.ethereal.email
+        port: 587
+        secure: false
+        auth:
+          user: 'maryam.berge@ethereal.email'
+          pass: '88DeEdPng8dupjQGVs'
+    mailCsv:
+      from: 'Lacollection <lacollection@test.com>'
+      subject: 'Your csv file export'
+      text: 'Please find attached the csv file you requested.'
+    mailPdf:
+          from: 'Lacollection <lacollection@test.com>'
+          subject: 'Your pdf file export'
+          text: 'Please find attached the pdf file you requested.'

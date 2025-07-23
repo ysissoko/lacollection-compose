@@ -14,18 +14,43 @@ services:
     image: ysissoko/lacollection-backend:${BACKEND_VERSION}
     container_name: lacollection-backend
     working_dir: /app
+    restart: always
     volumes:
       - .env:/app/.env:rw
       - ./upload/photos/palettes:/app/upload/photos/palettes:rw
       - ./upload/photos/areas:/app/upload/photos/areas:rw
       - ./upload/photos/options:/app/upload/photos/options:rw
-      - appdata:/app/data
+      - ./config/config.yaml:/app/config/config.yaml # Mount a file from the host
+
     ports:
       - "${APP_PORT-8080}:${APP_PORT-8080}"
     environment:
       - APP_PORT=${APP_PORT-8080}
       - DATA_DIR=${DATA_DIR-/app/data}
       - UPLOAD_DIR=${UPLOAD_DIR-/app/upload}
+    depends_on:
+      - database
+    networks:
+      - app-network # Assign to the custom network
 
+  database:
+      container_name: lacollection-db
+      image: postgres:15 # Use PostgreSQL version 15
+      restart: always
+      environment:
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_USER: postgres
+        POSTGRES_DB: lacollection_db # Database name
+      ports:
+        - '5432:5432' # Map PostgreSQL's port to the host
+      networks:
+        - app-network # Assign to the custom network
+      volumes:
+        - postgres_data:/var/lib/postgresql/data # Persist PostgreSQL data on the host
 volumes:
   appdata:
+  postgres_data:
+    driver: local
+networks:
+  app-network: # Define the custom network
+    driver: bridge # Default network driver
