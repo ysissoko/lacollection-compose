@@ -41,12 +41,25 @@ services:
         POSTGRES_PASSWORD: postgres
         POSTGRES_USER: postgres
         POSTGRES_DB: lacollection_db # Database name
+        POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
       ports:
         - '5432:5432' # Map PostgreSQL's port to the host
       networks:
         - app-network # Assign to the custom network
       volumes:
         - postgres_data:/var/lib/postgresql/data # Persist PostgreSQL data on the host
+  proxy:
+    image: jc21/nginx-proxy-manager:latest
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+      - "81:81" # Admin UI
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+    networks:
+      - app-network # Assign to the custom network
 volumes:
   appdata:
   postgres_data:
