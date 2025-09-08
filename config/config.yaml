@@ -82,3 +82,7 @@ api-gateway:
           from: 'Lacollection <lacollection@test.com>'
           subject: 'Your pdf file export'
           text: 'Please find attached the pdf file you requested.'
+translation-service:
+  host: translation-service
+  port: 3005
+  enabled: true
