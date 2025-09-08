@@ -10,6 +10,17 @@ services:
     depends_on:
       - backend
 
+  translation:
+    image: ysissoko/translation-service:${FRONTEND_VERSION}
+    container_name: translation-service
+    working_dir: /app
+    ports:
+      - "3005:3005"
+    depends_on:
+      - backend
+    networks:
+      - app-network # Assign to the custom network
+
   backend:
     image: ysissoko/lacollection-backend:${BACKEND_VERSION}
     container_name: lacollection-backend
