@@ -2,27 +2,29 @@ version: '3.8'
 
 services:
   frontend:
-    image: ysissoko/lacollection-app:${FRONTEND_VERSION}
+    image: ysissoko/lacollection-app:latest
     container_name: lacollection-app
     working_dir: /app
     ports:
       - "8080:80"
     depends_on:
       - backend
-
+    networks:
+      - app-network
   translation:
-    image: ysissoko/translation-service:${FRONTEND_VERSION}
+    image: ysissoko/translation-service:latest
     container_name: translation-service
     working_dir: /app
-    ports:
-      - "3005:3005"
     depends_on:
       - backend
     networks:
       - app-network # Assign to the custom network
+    volumes:  
+      - ./config/config.yaml:/app/config/config.yaml
+      - ./config/locales:/usr/src/app/dist/apps/translation-service/locales # Mount locales directory for persistence
 
   backend:
-    image: ysissoko/lacollection-backend:${BACKEND_VERSION}
+    image: ysissoko/lacollection-backend:latest
     container_name: lacollection-backend
     working_dir: /app
     restart: always
@@ -34,7 +36,7 @@ services:
       - ./config/config.yaml:/app/config/config.yaml # Mount a file from the host
 
     ports:
-      - "${APP_PORT-8080}:${APP_PORT-8080}"
+      - "3000:3000"
     environment:
       - APP_PORT=${APP_PORT-8080}
       - DATA_DIR=${DATA_DIR-/app/data}
@@ -53,8 +55,6 @@ services:
         POSTGRES_USER: postgres
         POSTGRES_DB: lacollection_db # Database name
         POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
-      ports:
-        - '5432:5432' # Map PostgreSQL's port to the host
       networks:
         - app-network # Assign to the custom network
       volumes:
@@ -71,6 +71,9 @@ services:
       - ./letsencrypt:/etc/letsencrypt
     networks:
       - app-network # Assign to the custom network
+    environment:
+      INITIAL_ADMIN_EMAIL: my@example.com
+      INITIAL_ADMIN_PASSWORD: mypassword1
 volumes:
   appdata:
   postgres_data:

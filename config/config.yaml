@@ -83,6 +83,6 @@ api-gateway:
           subject: 'Your pdf file export'
           text: 'Please find attached the pdf file you requested.'
 translation-service:
-  host: translation-service
+  host: translation
   port: 3005
   enabled: true
